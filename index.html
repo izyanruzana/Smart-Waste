@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waste Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
+</head>
+<body>
+    <h1>Smart Waste Management System</h1>
+    <input type="file" id="uploadImage" accept="image/*">
+    <button onclick="predict()">Predict</button>
+    <p id="result"></p>
+
+    <script>
+        const modelURL = "https://teachablemachine.withgoogle.com/models/EL3Ri-A7o/";
+        let model;
+
+        async function loadModel() {
+            model = await tmImage.load(modelURL + "model.json", modelURL + "metadata.json");
+        }
+        loadModel();
+
+        async function predict() {
+            let fileInput = document.getElementById("uploadImage");
+            let file = fileInput.files[0];
+            let image = document.createElement("img");
+            image.src = URL.createObjectURL(file);
+
+            image.onload = async function () {
+                const prediction = await model.predict(image);
+                let highest = prediction.reduce((p, c) => (p.probability > c.probability ? p : c));
+                document.getElementById("result").innerText = "Prediction: " + highest.className;
+            };
+        }
+    </script>
+</body>
+</html>
